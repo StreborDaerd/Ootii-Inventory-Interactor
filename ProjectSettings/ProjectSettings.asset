@@ -153,7 +153,8 @@ PlayerSettings:
   resetResolutionOnWindowResize: 0
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
-  applicationIdentifier: {}
+  applicationIdentifier:
+    Standalone: com.DefaultCompany.Ootii-Inventory-Interactor
   buildNumber:
     Standalone: 0
     iPhone: 0
@@ -592,7 +593,8 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    1: OOTII_AC;OOTII_MC;OOTII_MP;OOTII_CC
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

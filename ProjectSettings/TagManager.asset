@@ -3,25 +3,26 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Vehicle
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Layer 3
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Layer 6
+  - Layer 7
+  - Layer 8
+  - Layer 9
+  - Player
+  - Layer 11
+  - Layer 12
+  - Layer 13
+  - Layer 14
+  - Layer 15
+  - Layer 16
   - 
   - 
   - 
