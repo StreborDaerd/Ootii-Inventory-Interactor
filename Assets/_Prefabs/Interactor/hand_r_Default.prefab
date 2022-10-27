@@ -261,7 +261,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1606437992472657825
 Transform:
   m_ObjectHideFlags: 0
@@ -330,7 +330,7 @@ MonoBehaviour:
   - {x: 0.015930781, y: -0.05, z: -0.06944412}
   - {x: 0.007965386, y: -0.05, z: -0.059722055}
   - {x: 0, y: -0.05, z: -0.05}
-  asset: 0
+  asset: 1
   pathSegments:
   - startPosition: {x: 0.15134239, y: 0, z: -0.18471909}
     endPosition: {x: 0, y: 0, z: 0}
