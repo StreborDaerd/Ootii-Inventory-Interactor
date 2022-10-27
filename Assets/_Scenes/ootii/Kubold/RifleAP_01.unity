@@ -4873,9 +4873,16 @@ MonoBehaviour:
     MotionDefinitions:
     - '{, "Type" : "com.ootii.Actors.AnimationControllers.BasicIdle, ootii, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null", "Name" : "", "Form" : "-1", "Priority"
-      : "0", "OverrideLayers" : "False", "ActionAlias" : "", "IsEnabled" : "True",
+      : "0", "OverrideLayers" : "False", "ActionAlias" : "", "IsEnabled" : "False",
       "ReactivationDelay" : "0", "ShowDebug" : "False", "Category" : "1", "Pack"
       : "Basic", "Tags" : "AimSpineIK", "RotateWithCamera" : "True", "RotationToCameraSpeed"
+      : "360", "RotateWithInput" : "False", "RotationSpeed" : "120", "RotationSmoothing"
+      : "0.1"}'
+    - '{, "Type" : "WildWalrus.Actors.AnimationControllers.RifleAP_BasicIdle, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null", "Name" : "", "Form"
+      : "-1", "Priority" : "0", "OverrideLayers" : "False", "ActionAlias" : "", "IsEnabled"
+      : "True", "ReactivationDelay" : "0", "ShowDebug" : "False", "Category" : "1",
+      "Pack" : "Basic", "Tags" : "AimSpineIK", "RotateWithCamera" : "True", "RotationToCameraSpeed"
       : "360", "RotateWithInput" : "False", "RotationSpeed" : "120", "RotationSmoothing"
       : "0.1"}'
     - '{, "Type" : "WildWalrus.Actors.AnimationControllers.RifleAP_BasicWalkRunStrafe,
