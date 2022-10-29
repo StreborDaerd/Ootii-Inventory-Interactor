@@ -594,7 +594,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    1: OOTII_AC;OOTII_MC;OOTII_MP;OOTII_CC;PLAYMAKER;PLAYMAKER_1_9;PLAYMAKER_1_9_1;PLAYMAKER_1_8_OR_NEWER;PLAYMAKER_1_8_5_OR_NEWER;PLAYMAKER_1_9_OR_NEWER;PLAYMAKER_TMPRO;OOTII_SHMP
+    1: OOTII_AC;OOTII_MC;OOTII_MP;OOTII_CC;PLAYMAKER;PLAYMAKER_1_9;PLAYMAKER_1_9_1;PLAYMAKER_1_8_OR_NEWER;PLAYMAKER_1_8_5_OR_NEWER;PLAYMAKER_1_9_OR_NEWER;PLAYMAKER_TMPRO;OOTII_SHMP;OOTII_SSMP;OOTII_AYMP;OOTII_SCMP
     4: PLAYMAKER;PLAYMAKER_1_9;PLAYMAKER_1_9_1;PLAYMAKER_1_8_OR_NEWER;PLAYMAKER_1_8_5_OR_NEWER;PLAYMAKER_1_9_OR_NEWER
     7: PLAYMAKER;PLAYMAKER_1_9;PLAYMAKER_1_9_1;PLAYMAKER_1_8_OR_NEWER;PLAYMAKER_1_8_5_OR_NEWER;PLAYMAKER_1_9_OR_NEWER
     13: PLAYMAKER;PLAYMAKER_1_9;PLAYMAKER_1_9_1;PLAYMAKER_1_8_OR_NEWER;PLAYMAKER_1_8_5_OR_NEWER;PLAYMAKER_1_9_OR_NEWER
@@ -624,7 +624,8 @@ PlayerSettings:
   gcIncremental: 1
   assemblyVersionValidation: 1
   gcWBarrierValidation: 0
-  apiCompatibilityLevelPerPlatform: {}
+  apiCompatibilityLevelPerPlatform:
+    Standalone: 3
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: Template_3D
@@ -696,7 +697,7 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
