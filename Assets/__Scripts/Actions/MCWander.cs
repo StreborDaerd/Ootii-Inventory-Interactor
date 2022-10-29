@@ -13,7 +13,7 @@ namespace WildWalrus.BehaviorDesigner.Actions
 	[TaskDescription("Wander using the Unity NavMesh.")]
 	[TaskCategory("ootii/Motion Controller")]
 	[TaskIcon("Assets/Behavior Designer Movement/Editor/Icons/{SkinColor}WanderIcon.png")]
-	public class MCWander : MCNavigateTo
+	public class MCWander : MCSeek
 	{
 		[Tooltip("Minimum distance ahead of the current position to look ahead for a destination")]
 		public SharedFloat minWanderDistance = 20;
@@ -30,44 +30,59 @@ namespace WildWalrus.BehaviorDesigner.Actions
 		
 		private float pauseTime;
 		private float destinationReachTime;
-		
+
 		// There is no success or fail state with wander - the agent will just keep wandering
+
+		private bool targetSet = false;
+
+		public override void OnStart()
+		{
+			targetSet = TrySetTarget();
+
+			base.OnStart();
+		}
+
 		public override TaskStatus OnUpdate()
 		{
 			bool lIsDone = false;
 
-			if (UseNavMeshAgentPosition)
+			if(targetSet)
 			{
-				lIsDone = OnUpdate_NMA();
-			}
-			else
-			{
-				lIsDone = OnUpdate_MC();
+				lIsDone = MCNavMeshInputSource.OnUpdate();
+				if (lIsDone) { return TaskStatus.Success; }
 			}
 
 			//return (lIsDone ? TaskStatus.Success : TaskStatus.Running);
-
-			if (lIsDone)
+			Debug.Log("OnUpdate 0");
+			if (lIsDone || ! targetSet)
 			{
+				Debug.Log("OnUpdate 1");
+
 				// The agent should pause at the destination only if the max pause duration is greater than 0
 				if (maxPauseDuration.Value > 0)
 				{
+					Debug.Log("OnUpdate 2");
+
 					if (destinationReachTime == -1)
 					{
+						Debug.Log("OnUpdate 3");
 						destinationReachTime = Time.time;
 						pauseTime = Random.Range(minPauseDuration.Value, maxPauseDuration.Value);
 					}
 					if (destinationReachTime + pauseTime <= Time.time)
 					{
+						Debug.Log("OnUpdate 4");
 						// Only reset the time if a destination has been set.
 						if (TrySetTarget())
 						{
+							Debug.Log("OnUpdate 5");
 							destinationReachTime = -1;
 						}
 					}
 				}
 				else
 				{
+					Debug.Log("OnUpdate 6");
 					TrySetTarget();
 				}
 			}
@@ -91,8 +106,14 @@ namespace WildWalrus.BehaviorDesigner.Actions
 			if (validDestination)
 			{
 				TargetPosition = destination;
-				SetDestination(destination);
+				MCNavMeshInputSource.TargetPosition = TargetPosition.Value;
+				MCNavMeshInputSource.Target = null;
+				MCNavMeshInputSource.OnStart();
+				MCNavMeshInputSource.TargetVisualisation.position = TargetPosition.Value;
 			}
+
+			targetSet = validDestination;
+
 			return validDestination;
 		}
 		
@@ -111,7 +132,7 @@ namespace WildWalrus.BehaviorDesigner.Actions
 		protected bool SamplePosition(Vector3 position)
 		{
 			NavMeshHit hit;
-			return NavMesh.SamplePosition(position, out hit, mNavMeshAgent.height * 2, NavMesh.AllAreas);
+			return NavMesh.SamplePosition(position, out hit, MCNavMeshInputSource.mNavMeshAgent.height * 0.5f, NavMesh.AllAreas);
 		}
 	}
 }

@@ -3,6 +3,7 @@ using BehaviorDesigner.Runtime.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WildWalrus.Input;
 
 namespace WildWalrus.BehaviorDesigner.Actions
 {
@@ -13,11 +14,11 @@ namespace WildWalrus.BehaviorDesigner.Actions
 	{
 		public SharedTransform Target = null;
 
-		public SharedVector3 TargetPosition;
+		public SharedVector3 TargetPosition = null;
 
 		public bool IsFocusEnabled = false;
 
-		public SharedTransform FocusTarget;
+		public SharedTransform FocusTarget = null;
 
 		//public bool UseInputSourceDefaults = false;
 
@@ -33,7 +34,7 @@ namespace WildWalrus.BehaviorDesigner.Actions
 
 		public SharedFloat VoxelSize = 0.166f;
 
-		[SerializeField] MCNavMeshInputSource MCNavMeshInputSource;
+		[SerializeField] protected MCNavMeshInputSource MCNavMeshInputSource;
 
 		public override void OnStart()
 		{

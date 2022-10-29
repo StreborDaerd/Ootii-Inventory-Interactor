@@ -8,13 +8,13 @@ using UnityEngine.AI;
 using BehaviorDesigner.Runtime;
 using com.ootii.Helpers;
 
-namespace WildWalrus
+namespace WildWalrus.Input
 {
 	public class MCNavMeshInputSource : MonoBehaviour
 	{
 
 		[SerializeField]
-		protected NavMeshAgent mNavMeshAgent;// = null;
+		public NavMeshAgent mNavMeshAgent;// = null;
 
 		[SerializeField]
 		protected MotionController mMotionController;// = null;
@@ -62,14 +62,7 @@ namespace WildWalrus
 		protected bool mFirstPathSet = false;
 		protected bool mFirstPathValid = false;
 
-
-		private void Awake()
-		{
-			//GameObject lGameObject = GetDefaultGameObject(null);
-			//mMotionController = lGameObject.GetComponentInParent<MotionController>();
-
-			//mNavMeshAgent = lGameObject.GetComponent<NavMeshAgent>();
-		}
+		[SerializeField] public Transform TargetVisualisation;
 
 		public void OnStart()
 		{
@@ -108,7 +101,7 @@ namespace WildWalrus
 					ClearTarget();
 				}
 			}
-			else// if (!UseNavMeshAgentPosition)
+			else
 			{
 				if (lTargetDistance < StopDistance)
 				{
