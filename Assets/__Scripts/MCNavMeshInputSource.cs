@@ -1,11 +1,8 @@
 using com.ootii.Actors.AnimationControllers;
 using com.ootii.Actors.Navigation;
 using Utilities = com.ootii.Utilities;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using BehaviorDesigner.Runtime;
 using com.ootii.Helpers;
 
 namespace WildWalrus.Input
