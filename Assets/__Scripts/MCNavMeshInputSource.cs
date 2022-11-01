@@ -60,6 +60,7 @@ namespace WildWalrus.Input
 		protected bool mFirstPathValid = false;
 
 		[SerializeField] public Transform TargetVisualisation;
+		bool mNavMeshAgentNextPositionSet;
 
 		public void OnStart()
 		{
@@ -67,6 +68,9 @@ namespace WildWalrus.Input
 			mFirstPathSet = false;
 			mFirstPathValid = false;
 			mDestination = Vector3.zero;
+
+
+			mNavMeshAgent.nextPosition = mMotionController._Transform.position;
 
 			// Determine where we are moving to
 			Vector3 lTargetPosition = TargetPosition;
@@ -108,11 +112,19 @@ namespace WildWalrus.Input
 
 		}
 
+		private void LateUpdate()
+		{
+			//if(!mNavMeshAgentNextPositionSet)
+			{
+				mNavMeshAgent.nextPosition = mMotionController._Transform.position;
+			}
+		}
 
 		public bool OnUpdate()
 		{
+			Debug.Log("MCNavMeshInputSource OnUpdate");
 			Utilities.Debug.Log.FileWrite("");
-
+			mNavMeshAgentNextPositionSet = false;
 			// If we're on a link with no driver, create one
 			if (mNavMeshAgent.isOnOffMeshLink)
 			{
@@ -226,7 +238,7 @@ namespace WildWalrus.Input
 				// alway relative to our current position. Then, we can use the AC
 				// to move to a valid position.
 				mNavMeshAgent.nextPosition = mMotionController._Transform.position;
-
+				mNavMeshAgentNextPositionSet = true;
 				// Set the new target destination. We do it at the end so that
 				// we can process the current path before changing it
 				SetDestination(lDestination);
@@ -268,16 +280,44 @@ namespace WildWalrus.Input
 		}
 
 
-		protected void ClearTarget()
+		public void ClearTarget()
 		{
-			Utilities.Debug.Log.FileWrite("ClearTarget()");
-
+			//Utilities.Debug.Log.FileWrite("ClearTarget()");
+			Debug.Log("MCNavMeshInputSource ClearTarget()");
 			mHasArrived = true;
 			mFirstPathSet = false;
 			mFirstPathValid = false;
 
 			mMotionController.ClearTarget();
 			mNavMeshAgent.isStopped = true;
+			mNavMeshAgent.nextPosition = mMotionController._Transform.position;
+			//mNavMeshAgent.speed = 0f;
+			//mNavMeshAgent.
+			//mMotionController.GetMotion()
+		}
+
+
+		public void RotateToTarget()
+		{
+			Vector3 lDestination = TargetPosition;
+			if (Target != null && Target != null) { lDestination = Target.position; }
+
+			// Determine if we're at the destination
+			Vector3 lTargetDirection = lDestination - mMotionController._Transform.position;
+
+			if (lTargetDirection.sqrMagnitude < 0.005f)
+			{
+				return;
+			}
+
+			lTargetDirection = lTargetDirection.normalized;
+
+			float lAngle = NumberHelper.GetHorizontalAngle(mMotionController._Transform.forward, lTargetDirection, mMotionController._Transform.up);
+			//should actually use the rotation speed of the active motion but dificult to do
+			lAngle = Mathf.Sign(lAngle) * Mathf.Min(Mathf.Abs(lAngle), mNavMeshAgent.angularSpeed * Time.deltaTime);
+
+			Quaternion lRotation = mMotionController._Transform.rotation * Quaternion.AngleAxis(lAngle, Vector3.up);
+			mMotionController.SetTargetRotation(lRotation);
 		}
 	}
 }

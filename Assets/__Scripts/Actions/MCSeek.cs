@@ -30,7 +30,7 @@ namespace WildWalrus.BehaviorDesigner.Actions
 
 		public bool ForceRotation = true;
 
-		public SharedFloat VoxelSize = 0.166f;
+		public SharedFloat VoxelSize = 0.1666f;
 
 		[SerializeField] protected MCNavMeshInputSource MCNavMeshInputSource;
 
@@ -49,13 +49,58 @@ namespace WildWalrus.BehaviorDesigner.Actions
 			MCNavMeshInputSource.ForceRotation = ForceRotation;
 			MCNavMeshInputSource.VoxelSize = VoxelSize.Value;
 
+			MCNavMeshInputSource.mNavMeshAgent.isStopped = false;
+			MCNavMeshInputSource.mNavMeshAgent.speed = 10f;
 
 			MCNavMeshInputSource.OnStart();
+
 		}
 
 		public override TaskStatus OnUpdate()
 		{
-			return (MCNavMeshInputSource.OnUpdate() ? TaskStatus.Success : TaskStatus.Running);
+			if(MCNavMeshInputSource.OnUpdate())
+			{
+				Stop();
+				return TaskStatus.Success;
+			}
+			else
+			{
+				return TaskStatus.Running;
+			}
+
+			//return (MCNavMeshInputSource.OnUpdate() ? TaskStatus.Success : TaskStatus.Running);
+		}
+
+		public override void OnReset()
+		{
+			base.OnReset();
+			Target = null;
+			TargetPosition = Vector3.zero;
+
+			MCNavMeshInputSource.TargetPosition = TargetPosition.Value;
+			MCNavMeshInputSource.Target = Target.Value;
+		}
+
+		protected void Stop()
+		{
+			Debug.Log("MCNavMeshInputSource Stop");
+			//if (MCNavMeshInputSource.mNavMeshAgent.hasPath)
+			//{
+			//	MCNavMeshInputSource.mNavMeshAgent.isStopped = true;
+			//}
+			MCNavMeshInputSource.mNavMeshAgent.speed = 0f;
+
+			MCNavMeshInputSource.ClearTarget();
+		}
+
+		public override void OnBehaviorComplete()
+		{
+			Stop();
+		}
+
+		public override void OnEnd()
+		{
+			Stop();
 		}
 	}
 }

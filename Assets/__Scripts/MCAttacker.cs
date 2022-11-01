@@ -1,6 +1,7 @@
 using com.ootii.Actors.AnimationControllers;
 using com.ootii.Actors.Inventory;
 using com.ootii.Actors.LifeCores;
+using com.ootii.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,8 +30,6 @@ namespace WildWalrus
 		{
 			mActorCore.SetStateValue("State", 0);
 		}
-
-
 
 	}
 }
