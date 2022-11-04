@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using com.ootii.Actors.Inventory;
 using com.ootii.Cameras;
@@ -14,35 +13,36 @@ namespace WildWalrus.Actors.AnimationControllers
 {
 	[MotionName("Basic Shooter Empty 1")]
 	[MotionDescription("Test. Used on additional layers as the 'empty' motion to clear out any animation so that the base layer can be full-body. This version includes IK support for looking.")]
-	public class BasicShooterEmpty1 : BasicShooterMotion
+	public class BasicShooterEmpty1 : BasicShooterMotion1
 	{
-		/// <summary>
-		/// Trigger values for the motion
-		/// </summary>
+		#region MotionPhases
+		
 		public int PHASE_UNKNOWN = 0;
 		public int PHASE_START = 3010;
 
-		/// <summary>
-		/// Optional "Form" or "Style" required for this motion to activate
-		/// </summary>
+		#endregion MotionPhases
+
+
+		#region Properties
+
 		public string _RequiredForms = "500,550";
 		public string RequiredForms
 		{
 			get { return _RequiredForms; }
-
+			
 			set
 			{
 				_RequiredForms = value;
-
+				
 				if (Application.isPlaying)
 				{
 					mRequiredForms = null;
-
+					
 					if (_RequiredForms.Length > 0)
 					{
 						string[] lRequiredForms = _RequiredForms.Split(',');
 						mRequiredForms = new int[lRequiredForms.Length];
-
+						
 						for (int i = 0; i < lRequiredForms.Length; i++)
 						{
 							mRequiredForms[i] = -1;
@@ -52,85 +52,82 @@ namespace WildWalrus.Actors.AnimationControllers
 				}
 			}
 		}
+		
 
-		/// <summary>
-		/// ID of the slot that holds the weapon
-		/// </summary>
 		public string _WeaponSlotID = "RIGHT_HAND";
 		public string WeaponSlotID
 		{
 			get { return _WeaponSlotID; }
 			set { _WeaponSlotID = value; }
 		}
-
-		/// <summary>
-		/// ID of the slot that holds the weapon
-		/// </summary>
+		
+		
 		public string _AltWeaponSlotID = "LEFT_HAND";
 		public string AltWeaponSlotID
 		{
 			get { return _AltWeaponSlotID; }
 			set { _AltWeaponSlotID = value; }
 		}
+		
+		#endregion Properties
 
-		// Strings representing the required forms
+
+		#region Members
+		
 		protected int[] mRequiredForms = null;
-
-		// Determines if we use look IK locally
+		
 		protected bool mIsLookIKEnabledLocally = true;
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		public BasicShooterEmpty1()
-			 : base()
+		#endregion Members
+
+
+		#region Constructors
+		
+		public BasicShooterEmpty1() : base()
 		{
 			_Category = EnumMotionCategories.IDLE;
-
+			
 			_Priority = 1;
 			_Form = 0;
-
+			
 			mLookIKMaxHorizontalAngle = 45f;
-
+			
+#if UNITY_EDITOR
+			if (_EditorAnimatorSMName.Length == 0) { _EditorAnimatorSMName = "Empty-SM"; }
+#endif
+		}
+		
+		
+		public BasicShooterEmpty1(MotionController rController) : base(rController)
+		{
+			_Category = EnumMotionCategories.IDLE;
+			
+			_Priority = 1;
+			_Form = 0;
+			
+			mLookIKMaxHorizontalAngle = 45f;
+			
 #if UNITY_EDITOR
 			if (_EditorAnimatorSMName.Length == 0) { _EditorAnimatorSMName = "Empty-SM"; }
 #endif
 		}
 
-		/// <summary>
-		/// Controller constructor
-		/// </summary>
-		/// <param name="rController">Controller the motion belongs to</param>
-		public BasicShooterEmpty1(MotionController rController)
-			 : base(rController)
-		{
-			_Category = EnumMotionCategories.IDLE;
+		#endregion Constructors
 
-			_Priority = 1;
-			_Form = 0;
 
-			mLookIKMaxHorizontalAngle = 45f;
-
-#if UNITY_EDITOR
-			if (_EditorAnimatorSMName.Length == 0) { _EditorAnimatorSMName = "Empty-SM"; }
-#endif
-		}
-
-		/// <summary>
-		/// Awake is called after all objects are initialized so you can safely speak to other objects. This is where
-		/// reference can be associated.
-		/// </summary>
+		#region MotionFunctions
+		
 		public override void Awake()
 		{
 			base.Awake();
 			RequiredForms = _RequiredForms;
-
+			
 			// Object that will provide access to attributes
 			if (_InventorySourceOwner != null)
 			{
 				mInventorySource = InterfaceHelper.GetComponent<IInventorySource>(_InventorySourceOwner);
 			}
-
+			
 			// If the input source is still null, see if we can grab a local input source
 			if (mInventorySource == null && mMotionController != null)
 			{
@@ -139,24 +136,21 @@ namespace WildWalrus.Actors.AnimationControllers
 			}
 		}
 
-		/// <summary>
-		/// Tests if this motion should be started. However, the motion
-		/// isn't actually started.
-		/// </summary>
-		/// <returns></returns>
+		#region Tests
+		
 		public override bool TestActivate()
 		{
 			// Handle the disqualifiers
 			if (!mIsStartable) { return false; }
 			if (!mMotionController.IsGrounded) { return false; }
-
+			
 			// This is a catch all. If there are no motions found to match
 			// the controller's state, we default to this motion.
 			if (mMotionLayer.ActiveMotion != null && !(mMotionLayer.ActiveMotion is Empty)) { return false; }
-
+			
 			// Check if we're in the required form
 			bool lFormValidated = (mRequiredForms == null);
-
+			
 			// Check if we're in the required form
 			if (!lFormValidated)
 			{
@@ -170,28 +164,24 @@ namespace WildWalrus.Actors.AnimationControllers
 					}
 				}
 			}
-
+			
 			if (!lFormValidated) { return false; }
-
+			
 			// If we get here, we're good
 			return true;
 		}
-
-		/// <summary>
-		/// Tests if the motion should continue. If it shouldn't, the motion
-		/// is typically disabled
-		/// </summary>
-		/// <returns></returns>
+		
+		
 		public override bool TestUpdate()
 		{
 			if (mIsAnimatorActive && !IsInMotionState)
 			{
 				return false;
 			}
-
+			
 			// Check if we're in the required form
 			bool lFormValidated = (mRequiredForms == null);
-
+			
 			// Check if we're in the required form
 			if (!lFormValidated)
 			{
@@ -205,74 +195,66 @@ namespace WildWalrus.Actors.AnimationControllers
 					}
 				}
 			}
-
+			
 			if (!lFormValidated) { return false; }
-
+			
 			// Stay in
 			return true;
 		}
-
-		/// <summary>
-		/// Raised when a motion is being interrupted by another motion
-		/// </summary>
-		/// <param name="rMotion">Motion doing the interruption</param>
-		/// <returns>Boolean determining if it can be interrupted</returns>
+		
+		
 		public override bool TestInterruption(MotionControllerMotion rMotion)
 		{
 			if (mLookIKWeight > 0f && !(rMotion is BasicShooterAttack))
 			{
 				EaseOutIK(_LookIKOutSpeed);
 			}
-
+			
 			return true;
 		}
+		
+		#endregion Tests
+		
 
-		/// <summary>
-		/// Called to start the specific motion. If the motion
-		/// were something like 'jump', this would start the jumping process
-		/// </summary>
-		/// <param name="rPrevMotion">Motion that this motion is taking over from</param>
 		public override bool Activate(MotionControllerMotion rPrevMotion)
 		{
 			// First, see if we can find a weapon in hand
 			mGunCore = FindWeapon(WeaponSlotID);
 			if (mGunCore == null) { mGunCore = FindWeapon(AltWeaponSlotID); }
-
+			
 			if (mGunCore != null)
 			{
 				mGunSupport = mGunCore.gameObject.transform.Find("Support");
 			}
-
+			
 			// Clear out any old look IK
 			if (mLookIKEasingFunction != null)
 			{
 				mMotionController.StopCoroutine(mLookIKEasingFunction);
 				mLookIKEasingFunction = null;
 			}
-
+			
 			// Use the weight of the attack motion as we may already be using IK
 			if (rPrevMotion is BasicShooterAttack)
 			{
 				mLookIKWeight = ((BasicShooterAttack)rPrevMotion).LookIKWeight;
 			}
-
+			
 			// Register this motion with the camera
 			if (mMotionController.CameraRig is BaseCameraRig)
 			{
 				((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate -= OnCameraUpdated;
 				((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate += OnCameraUpdated;
 			}
-
+			
 			// Move to the empty state
 			mMotionController.SetAnimatorMotionPhase(mMotionLayer.AnimatorLayerIndex, PHASE_START, _Form, mParameter, true);
-
+			
 			// Finalize the activation
 			return base.Activate(rPrevMotion);
 		}
-
-		/// <summary>
-		/// Raised when we shut the motion down
-		/// </summary>
+		
+		
 		public override void Deactivate()
 		{
 			// Clear the gun so we can grab a new one later
@@ -281,47 +263,35 @@ namespace WildWalrus.Actors.AnimationControllers
 				mGunCore = null;
 				mGunSupport = null;
 			}
-
+			
 			// Unregister this motion with the camera
 			if (mMotionController.CameraRig is BaseCameraRig)
 			{
 				((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate -= OnCameraUpdated;
 			}
-
+			
 			// Continue with the deactivation
 			base.Deactivate();
 		}
-
-		/// <summary>
-		/// Allows the motion to modify the velocity before it is applied.
-		/// </summary>
-		/// <param name="rDeltaTime">Time since the last frame (or fixed update call)</param>
-		/// <param name="rUpdateIndex">Index of the update to help manage dynamic/fixed updates. [0: Invalid update, >=1: Valid update]</param>
-		/// <param name="rMovement">Amount of movement caused by root motion this frame</param>
-		/// <param name="rRotation">Amount of rotation caused by root motion this frame</param>
-		/// <returns></returns>
+		
+		
 		public override void UpdateRootMotion(float rDeltaTime, int rUpdateIndex, ref Vector3 rMovement, ref Quaternion rRotation)
 		{
 			rMovement = Vector3.zero;
 			rRotation = Quaternion.identity;
 		}
-
-		/// <summary>
-		/// Updates the motion over time. This is called by the controller
-		/// every update cycle so animations and stages can be updated.
-		/// </summary>
-		/// <param name="rDeltaTime">Time since the last frame (or fixed update call)</param>
-		/// <param name="rUpdateIndex">Index of the update to help manage dynamic/fixed updates. [0: Invalid update, >=1: Valid update]</param>
+		
+		
 		public override void Update(float rDeltaTime, int rUpdateIndex)
 		{
 			mIsLookIKEnabledLocally = _IsLookIKEnabled;
-
+			
 			// If spine IK isn't meant to be active, shut it down
 			if (mIsLookIKEnabledLocally && _LookIKMotionTag.Length > 0)
 			{
 				MotionControllerLayer lBaseLayer = mMotionController.MotionLayers[0];
 				MotionControllerMotion lBaseMotion = lBaseLayer.ActiveMotion;
-
+				
 				if (lBaseMotion == null)
 				{
 					mLookIKWeight = 0f;
@@ -346,7 +316,7 @@ namespace WildWalrus.Actors.AnimationControllers
 					}
 				}
 			}
-
+			
 			// Only run IK if we're meant to
 			if (_IsLookIKEnabled)
 			{
@@ -355,13 +325,13 @@ namespace WildWalrus.Actors.AnimationControllers
 				{
 					mLookIKRotation = mGunCore.transform.rotation;
 					mLookIKRotation = mMotionController._Transform.rotation.RotationTo(mLookIKRotation);
-
+					
 					if (mIsLookIKEnabledLocally && mLookIKWeight < 1f && mLookIKEasingFunction == null)
 					{
 						EaseInIK(_LookIKInSpeed);
 					}
 				}
-
+				
 				// Run spine IK
 				if (mGunCore != null && !(mMotionController.CameraRig is BaseCameraRig))
 				{
@@ -371,10 +341,10 @@ namespace WildWalrus.Actors.AnimationControllers
 						{
 							Quaternion lTargetRotation = mMotionController._Transform.rotation;
 							if (mMotionController._CameraTransform != null) { lTargetRotation = mMotionController._CameraTransform.rotation; }
-
+							
 							mLookIKRotation = mGunCore.transform.rotation;
 							mLookIKRotation = mMotionController._Transform.rotation.RotationTo(mLookIKRotation);
-
+							
 							RotateSpineToDirection(mLookIKRotation, lTargetRotation, mLookIKWeight);
 							if (mGunSupport != null) { RotateArmToSupport(mGunSupport.position, mLookIKWeight); }
 						}
@@ -382,15 +352,8 @@ namespace WildWalrus.Actors.AnimationControllers
 				}
 			}
 		}
-
-		/// <summary>
-		/// When a motion is deactivated, it may need to live to do some clean up. In this case,
-		/// this function will run. However, the motion should not expect to be in sync with the animator.
-		/// Once the motion returns 'false', the updates will stop.
-		/// </summary>
-		/// <param name="rDeltaTime">Time since the last frame (or fixed update call)</param>
-		/// <param name="rUpdateIndex">Index of the update to help manage dynamic/fixed updates. [0: Invalid update, >=1: Valid update]</param>
-		/// <returns>Return true to continue the deactivated updates or false to stop them</returns>
+		
+		
 		public override bool DeactivatedUpdate(float rDeltaTime, int rUpdateIndex)
 		{
 			if (!mIsLookIKEnabledLocally) { return false; }
@@ -399,26 +362,21 @@ namespace WildWalrus.Actors.AnimationControllers
 			if (mLookIKEasingFunction == null) { return false; }
 			if (mLookIKWeight > 0f && mMotionLayer.ActiveMotion is BasicShooterAttack) { return false; }
 			if (mMotionController._CameraTransform == null) { return false; }
-
+			
 			Quaternion lTargetRotation = mMotionController._Transform.rotation;
 			if (mMotionController._CameraTransform != null) { lTargetRotation = mMotionController._CameraTransform.rotation; }
-
+			
 			RotateSpineToDirection(mLookIKRotation, lTargetRotation, mLookIKWeight);
 			if (mGunSupport != null) { RotateArmToSupport(mGunSupport.position, mLookIKWeight); }
-
+			
 			return true;
 		}
 
-		/// <summary>
-		/// When we want to rotate based on the camera direction (which input does), we need to tweak the actor
-		/// rotation AFTER we process the camera. Otherwise, we can get small stutters during camera rotation. 
-		/// 
-		/// This is the only way to keep them totally in sync. It also means we can't run any of our AC processing
-		/// as the AC already ran. So, we do minimal work here
-		/// </summary>
-		/// <param name="rDeltaTime"></param>
-		/// <param name="rUpdateCount"></param>
-		/// <param name="rCamera"></param>
+		#endregion Motion
+
+
+		#region Events
+		
 		protected void OnCameraUpdated(float rDeltaTime, int rUpdateIndex, BaseCameraRig rCameraRig)
 		{
 			// If we're aiming, use IK
@@ -430,7 +388,7 @@ namespace WildWalrus.Actors.AnimationControllers
 					{
 						mLookIKRotation = mGunCore.transform.rotation;
 						mLookIKRotation = mMotionController._Transform.rotation.RotationTo(mLookIKRotation);
-
+						
 						RotateSpineToDirection(mLookIKRotation, mMotionController._CameraTransform.rotation, mLookIKWeight);
 						if (mGunSupport != null) { RotateArmToSupport(mGunSupport.position, mLookIKWeight); }
 					}
@@ -438,153 +396,400 @@ namespace WildWalrus.Actors.AnimationControllers
 			}
 		}
 
-		/// <summary>
-		/// Eases in the IK for aiming over the specified time
-		/// </summary>
-		/// <param name="rTime">Time to ease into aiming</param>
-		/// <param name="rSmooth">Determines if we smooth out the easing</param>
-		/// <returns></returns>
-		//protected override IEnumerator EaseOutIKInternal(float rTime, bool rSmooth = true)
-		//{
-		//    float lStartTime = Time.time - (rTime * (1f - mLookIKWeight));
+		#endregion Events
 
-		//    while (_IsLookIKEnabled && mLookIKWeight > 0f)
-		//    {
-		//        mLookIKWeight = 1f - Mathf.Clamp01((Time.time - lStartTime) / rTime);
-		//        if (rSmooth) { mLookIKWeight = NumberHelper.EaseInOutCubic(mLookIKWeight); }
 
-		//        yield return null;
-		//    }
-
-		//    // Clear out IK support
-		//    mLookIKRotation = Quaternion.identity;
-		//    mLookIKEasingFunction = null;
-		//}
-
-		// **************************************************************************************************
-		// Following properties and function only valid while editing
-		// **************************************************************************************************
+		#region EditorGUI
 
 #if UNITY_EDITOR
-
-		/// <summary>
-		/// Allow the constraint to render it's own GUI
-		/// </summary>
-		/// <returns>Reports if the object's value was changed</returns>
+		
 		public override bool OnInspectorGUI()
 		{
 			bool lIsDirty = false;
-
-			if (EditorHelper.TextField("Required Forms", "Comma delimited list of forms that this motion will activate for.", RequiredForms, mMotionController))
+			
+			if (EditorHelper.TextField("Required Forms",
+				"Comma delimited list of forms that this motion will activate for.",
+				RequiredForms, mMotionController))
 			{
 				lIsDirty = true;
 				RequiredForms = EditorHelper.FieldStringValue;
 			}
-
+			
 			GUILayout.Space(5f);
-
+			
 			EditorHelper.DrawInspectorDescription("IK properties for aiming the gun", MessageType.None);
-
-			if (EditorHelper.BoolField("Enable Look IK", "Determines if we'll use the camera to rotate the spine forward.", IsLookIKEnabled, mMotionController))
+			
+			if (EditorHelper.BoolField("Enable Look IK",
+				"Determines if we'll use the camera to rotate the spine forward.",
+				IsLookIKEnabled, mMotionController))
 			{
 				lIsDirty = true;
 				IsLookIKEnabled = EditorHelper.FieldBoolValue;
 			}
-
+			
 			if (IsLookIKEnabled)
 			{
-				if (EditorHelper.TextField("IK Tag", "Tag required by the first motion layer in order for us to enable spine IK", LookIKMotionTag, mMotionController))
+				if (EditorHelper.TextField("IK Tag",
+					"Tag required by the first motion layer in order for us to enable spine IK",
+					LookIKMotionTag, mMotionController))
 				{
 					lIsDirty = true;
 					LookIKMotionTag = EditorHelper.FieldStringValue;
 				}
-
+				
 				// IK Angles
 				GUILayout.BeginHorizontal();
-
-				EditorGUILayout.LabelField(new GUIContent("IK Time", "Time in seconds to transition the IK in and out."), GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
-
+				
+				EditorGUILayout.LabelField(new GUIContent("IK Time",
+					"Time in seconds to transition the IK in and out."),
+					GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
+				
 				if (EditorHelper.FloatField(LookIKInSpeed, "IK In", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					LookIKInSpeed = EditorHelper.FieldFloatValue;
 				}
-
+				
 				if (EditorHelper.FloatField(LookIKOutSpeed, "IK Out", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					LookIKOutSpeed = EditorHelper.FieldFloatValue;
 				}
-
+				
 				GUILayout.EndHorizontal();
-
+				
 				// IK Angles
 				GUILayout.BeginHorizontal();
-
-				EditorGUILayout.LabelField(new GUIContent("IK Angles", "Additional IK angles used when aiming."), GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
-
+				
+				EditorGUILayout.LabelField(new GUIContent("IK Angles",
+					"Additional IK angles used when aiming."),
+					GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
+				
 				if (EditorHelper.FloatField(LookIKHorizontalAngle, "Horizonal Aim", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					LookIKHorizontalAngle = EditorHelper.FieldFloatValue;
 				}
-
+				
 				if (EditorHelper.FloatField(LookIKVerticalAngle, "Vertical Aim", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					LookIKVerticalAngle = EditorHelper.FieldFloatValue;
 				}
-
+				
 				GUILayout.EndHorizontal();
-
+				
 				// IK Angles
 				GUILayout.BeginHorizontal();
-
-				EditorGUILayout.LabelField(new GUIContent("Quick IK Angles", "Additional IK angles used when fast shooting."), GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
-
+				
+				EditorGUILayout.LabelField(new GUIContent("Quick IK Angles",
+					"Additional IK angles used when fast shooting."),
+					GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
+				
 				if (EditorHelper.FloatField(FastHorizontalAimAngle, "Fast Horizonal Aim", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					FastHorizontalAimAngle = EditorHelper.FieldFloatValue;
 				}
-
+				
 				if (EditorHelper.FloatField(FastVerticalAimAngle, "Fast Vertical Aim", mMotionController, 0f, 20f))
 				{
 					lIsDirty = true;
 					FastVerticalAimAngle = EditorHelper.FieldFloatValue;
 				}
-
+				
 				GUILayout.EndHorizontal();
-
+				
 				GUILayout.Space(5f);
 			}
-
-			if (EditorHelper.BoolField("Enable Arm IK", "Determines if we use the 'Support' transform for arm IK.", IsSupportIKEnabled, mMotionController))
+			
+			if (EditorHelper.BoolField("Enable Arm IK",
+				"Determines if we use the 'Support' transform for arm IK.",
+				IsSupportIKEnabled, mMotionController))
 			{
 				lIsDirty = true;
 				IsSupportIKEnabled = EditorHelper.FieldBoolValue;
 			}
-
+			
 			GUILayout.Space(5f);
-
+			
 			EditorHelper.DrawInspectorDescription("Inventory information about the weapon.", MessageType.None);
-
-			GameObject lNewAttributeSourceOwner = EditorHelper.InterfaceOwnerField<IInventorySource>(new GUIContent("Inventory Source", "Inventory source we'll use for accessing items and slots."), InventorySourceOwner, true);
+			
+			GameObject lNewAttributeSourceOwner =
+				EditorHelper.InterfaceOwnerField<IInventorySource>(
+					new GUIContent("Inventory Source", "Inventory source we'll use for accessing items and slots."),
+					InventorySourceOwner, true);
 			if (lNewAttributeSourceOwner != InventorySourceOwner)
 			{
 				lIsDirty = true;
 				InventorySourceOwner = lNewAttributeSourceOwner;
 			}
-
-			if (EditorHelper.TextField("Weapon Slot ID", "Inventory slot ID holding the weapon.", WeaponSlotID, mMotionController))
+			
+			if (EditorHelper.TextField("Weapon Slot ID",
+				"Inventory slot ID holding the weapon.",
+				WeaponSlotID, mMotionController))
 			{
 				lIsDirty = true;
 				WeaponSlotID = EditorHelper.FieldStringValue;
 			}
-
+			
 			return lIsDirty;
+		}
+		
+#endif
+		
+		#endregion EditorGUI
+
+
+		#region Auto-Generated
+		// ************************************ START AUTO GENERATED ************************************
+
+		/// <summary>
+		/// These declarations go inside the class so you can test for which state
+		/// and transitions are active. Testing hash values is much faster than strings.
+		/// </summary>
+		public int STATE_Empty = -1;
+		public int STATE_EmptyPose = -1;
+		public int TRANS_AnyState_EmptyPose = -1;
+		public int TRANS_EntryState_EmptyPose = -1;
+
+		/// <summary>
+		/// Determines if we're using auto-generated code
+		/// </summary>
+		public override bool HasAutoGeneratedCode
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Used to determine if the actor is in one of the states for this motion
+		/// </summary>
+		/// <returns></returns>
+		public override bool IsInMotionState
+		{
+			get
+			{
+				int lStateID = mMotionLayer._AnimatorStateID;
+				int lTransitionID = mMotionLayer._AnimatorTransitionID;
+
+				if (lTransitionID == 0)
+				{
+					if (lStateID == STATE_Empty) { return true; }
+					if (lStateID == STATE_EmptyPose) { return true; }
+				}
+
+				if (lTransitionID == TRANS_AnyState_EmptyPose) { return true; }
+				if (lTransitionID == TRANS_EntryState_EmptyPose) { return true; }
+				if (lTransitionID == TRANS_AnyState_EmptyPose) { return true; }
+				if (lTransitionID == TRANS_EntryState_EmptyPose) { return true; }
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Used to determine if the actor is in one of the states for this motion
+		/// </summary>
+		/// <returns></returns>
+		public override bool IsMotionState(int rStateID)
+		{
+			if (rStateID == STATE_Empty) { return true; }
+			if (rStateID == STATE_EmptyPose) { return true; }
+			return false;
+		}
+
+		/// <summary>
+		/// Used to determine if the actor is in one of the states for this motion
+		/// </summary>
+		/// <returns></returns>
+		public override bool IsMotionState(int rStateID, int rTransitionID)
+		{
+			if (rTransitionID == 0)
+			{
+				if (rStateID == STATE_Empty) { return true; }
+				if (rStateID == STATE_EmptyPose) { return true; }
+			}
+
+			if (rTransitionID == TRANS_AnyState_EmptyPose) { return true; }
+			if (rTransitionID == TRANS_EntryState_EmptyPose) { return true; }
+			if (rTransitionID == TRANS_AnyState_EmptyPose) { return true; }
+			if (rTransitionID == TRANS_EntryState_EmptyPose) { return true; }
+			return false;
+		}
+
+		/// <summary>
+		/// Preprocess any animator data so the motion can use it later
+		/// </summary>
+		public override void LoadAnimatorData()
+		{
+			string lLayer = mMotionController.Animator.GetLayerName(mMotionLayer._AnimatorLayerIndex);
+			TRANS_AnyState_EmptyPose = mMotionController.AddAnimatorName("AnyState -> " + lLayer + ".Empty-SM.EmptyPose");
+			TRANS_EntryState_EmptyPose = mMotionController.AddAnimatorName("Entry -> " + lLayer + ".Empty-SM.EmptyPose");
+			TRANS_AnyState_EmptyPose = mMotionController.AddAnimatorName("AnyState -> " + lLayer + ".Empty-SM.EmptyPose");
+			TRANS_EntryState_EmptyPose = mMotionController.AddAnimatorName("Entry -> " + lLayer + ".Empty-SM.EmptyPose");
+			STATE_Empty = mMotionController.AddAnimatorName("" + lLayer + ".Empty");
+			STATE_EmptyPose = mMotionController.AddAnimatorName("" + lLayer + ".Empty-SM.EmptyPose");
+		}
+
+#if UNITY_EDITOR
+
+		/// <summary>
+		/// New way to create sub-state machines without destroying what exists first.
+		/// </summary>
+		protected override void CreateStateMachine()
+		{
+			int rLayerIndex = mMotionLayer._AnimatorLayerIndex;
+			MotionController rMotionController = mMotionController;
+
+			UnityEditor.Animations.AnimatorController lController = null;
+
+			Animator lAnimator = rMotionController.Animator;
+			if (lAnimator == null) { lAnimator = rMotionController.gameObject.GetComponent<Animator>(); }
+			if (lAnimator != null) { lController = lAnimator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController; }
+			if (lController == null) { return; }
+
+			while (lController.layers.Length <= rLayerIndex)
+			{
+				UnityEditor.Animations.AnimatorControllerLayer lNewLayer = new UnityEditor.Animations.AnimatorControllerLayer();
+				lNewLayer.name = "Layer " + (lController.layers.Length + 1);
+				lNewLayer.stateMachine = new UnityEditor.Animations.AnimatorStateMachine();
+				lController.AddLayer(lNewLayer);
+			}
+
+			UnityEditor.Animations.AnimatorControllerLayer lLayer = lController.layers[rLayerIndex];
+
+			UnityEditor.Animations.AnimatorStateMachine lLayerStateMachine = lLayer.stateMachine;
+
+			UnityEditor.Animations.AnimatorStateMachine lSSM_98366 = MotionControllerMotion.EditorFindSSM(lLayerStateMachine, "Empty-SM");
+			if (lSSM_98366 == null) { lSSM_98366 = lLayerStateMachine.AddStateMachine("Empty-SM", new Vector3(192, -480, 0)); }
+
+			UnityEditor.Animations.AnimatorState lState_98274 = MotionControllerMotion.EditorFindState(lSSM_98366, "EmptyPose");
+			if (lState_98274 == null) { lState_98274 = lSSM_98366.AddState("EmptyPose", new Vector3(312, 84, 0)); }
+			lState_98274.speed = 1f;
+			lState_98274.mirror = false;
+			lState_98274.tag = "";
+
+			UnityEditor.Animations.AnimatorStateTransition lAnyTransition_98098 = MotionControllerMotion.EditorFindAnyStateTransition(lLayerStateMachine, lState_98274, 0);
+			if (lAnyTransition_98098 == null) { lAnyTransition_98098 = lLayerStateMachine.AddAnyStateTransition(lState_98274); }
+			lAnyTransition_98098.isExit = false;
+			lAnyTransition_98098.hasExitTime = false;
+			lAnyTransition_98098.hasFixedDuration = true;
+			lAnyTransition_98098.exitTime = 0.75f;
+			lAnyTransition_98098.duration = 0.15f;
+			lAnyTransition_98098.offset = 0f;
+			lAnyTransition_98098.mute = false;
+			lAnyTransition_98098.solo = false;
+			lAnyTransition_98098.canTransitionToSelf = false;
+			lAnyTransition_98098.orderedInterruption = false;
+			lAnyTransition_98098.interruptionSource = (UnityEditor.Animations.TransitionInterruptionSource)2;
+			for (int i = lAnyTransition_98098.conditions.Length - 1; i >= 0; i--) { lAnyTransition_98098.RemoveCondition(lAnyTransition_98098.conditions[i]); }
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 3010f, "L" + rLayerIndex + "MotionPhase");
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionForm");
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionParameter");
+
+			UnityEditor.Animations.AnimatorStateTransition lAnyTransition_98062 = MotionControllerMotion.EditorFindAnyStateTransition(lLayerStateMachine, lState_98274, 1);
+			if (lAnyTransition_98062 == null) { lAnyTransition_98062 = lLayerStateMachine.AddAnyStateTransition(lState_98274); }
+			lAnyTransition_98062.isExit = false;
+			lAnyTransition_98062.hasExitTime = false;
+			lAnyTransition_98062.hasFixedDuration = true;
+			lAnyTransition_98062.exitTime = 0.75f;
+			lAnyTransition_98062.duration = 0f;
+			lAnyTransition_98062.offset = 0f;
+			lAnyTransition_98062.mute = false;
+			lAnyTransition_98062.solo = false;
+			lAnyTransition_98062.canTransitionToSelf = false;
+			lAnyTransition_98062.orderedInterruption = false;
+			lAnyTransition_98062.interruptionSource = (UnityEditor.Animations.TransitionInterruptionSource)2;
+			for (int i = lAnyTransition_98062.conditions.Length - 1; i >= 0; i--) { lAnyTransition_98062.RemoveCondition(lAnyTransition_98062.conditions[i]); }
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 3010f, "L" + rLayerIndex + "MotionPhase");
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionForm");
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 1f, "L" + rLayerIndex + "MotionParameter");
+
+
+			// Run any post processing after creating the state machine
+			OnStateMachineCreated();
 		}
 
 #endif
+
+		// ************************************ END AUTO GENERATED ************************************
+		#endregion
+
+
+		#region Definition
+
+		/// <summary>
+		/// New way to create sub-state machines without destroying what exists first.
+		/// </summary>
+		public static void ExtendBasicMotion(MotionController rMotionController, int rLayerIndex)
+		{
+			UnityEditor.Animations.AnimatorController lController = null;
+
+			Animator lAnimator = rMotionController.Animator;
+			if (lAnimator == null) { lAnimator = rMotionController.gameObject.GetComponent<Animator>(); }
+			if (lAnimator != null) { lController = lAnimator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController; }
+			if (lController == null) { return; }
+
+			while (lController.layers.Length <= rLayerIndex)
+			{
+				UnityEditor.Animations.AnimatorControllerLayer lNewLayer = new UnityEditor.Animations.AnimatorControllerLayer();
+				lNewLayer.name = "Layer " + (lController.layers.Length + 1);
+				lNewLayer.stateMachine = new UnityEditor.Animations.AnimatorStateMachine();
+				lController.AddLayer(lNewLayer);
+			}
+
+			UnityEditor.Animations.AnimatorControllerLayer lLayer = lController.layers[rLayerIndex];
+
+			UnityEditor.Animations.AnimatorStateMachine lLayerStateMachine = lLayer.stateMachine;
+
+			UnityEditor.Animations.AnimatorStateMachine lSSM_98366 = MotionControllerMotion.EditorFindSSM(lLayerStateMachine, "Empty-SM");
+			if (lSSM_98366 == null) { lSSM_98366 = lLayerStateMachine.AddStateMachine("Empty-SM", new Vector3(192, -480, 0)); }
+
+			UnityEditor.Animations.AnimatorState lState_98274 = MotionControllerMotion.EditorFindState(lSSM_98366, "EmptyPose");
+			if (lState_98274 == null) { lState_98274 = lSSM_98366.AddState("EmptyPose", new Vector3(312, 84, 0)); }
+			lState_98274.speed = 1f;
+			lState_98274.mirror = false;
+			lState_98274.tag = "";
+
+			UnityEditor.Animations.AnimatorStateTransition lAnyTransition_98098 = MotionControllerMotion.EditorFindAnyStateTransition(lLayerStateMachine, lState_98274, 0);
+			if (lAnyTransition_98098 == null) { lAnyTransition_98098 = lLayerStateMachine.AddAnyStateTransition(lState_98274); }
+			lAnyTransition_98098.isExit = false;
+			lAnyTransition_98098.hasExitTime = false;
+			lAnyTransition_98098.hasFixedDuration = true;
+			lAnyTransition_98098.exitTime = 0.75f;
+			lAnyTransition_98098.duration = 0.15f;
+			lAnyTransition_98098.offset = 0f;
+			lAnyTransition_98098.mute = false;
+			lAnyTransition_98098.solo = false;
+			lAnyTransition_98098.canTransitionToSelf = false;
+			lAnyTransition_98098.orderedInterruption = false;
+			lAnyTransition_98098.interruptionSource = (UnityEditor.Animations.TransitionInterruptionSource)2;
+			for (int i = lAnyTransition_98098.conditions.Length - 1; i >= 0; i--) { lAnyTransition_98098.RemoveCondition(lAnyTransition_98098.conditions[i]); }
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 3010f, "L" + rLayerIndex + "MotionPhase");
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionForm");
+			lAnyTransition_98098.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionParameter");
+
+			UnityEditor.Animations.AnimatorStateTransition lAnyTransition_98062 = MotionControllerMotion.EditorFindAnyStateTransition(lLayerStateMachine, lState_98274, 1);
+			if (lAnyTransition_98062 == null) { lAnyTransition_98062 = lLayerStateMachine.AddAnyStateTransition(lState_98274); }
+			lAnyTransition_98062.isExit = false;
+			lAnyTransition_98062.hasExitTime = false;
+			lAnyTransition_98062.hasFixedDuration = true;
+			lAnyTransition_98062.exitTime = 0.75f;
+			lAnyTransition_98062.duration = 0f;
+			lAnyTransition_98062.offset = 0f;
+			lAnyTransition_98062.mute = false;
+			lAnyTransition_98062.solo = false;
+			lAnyTransition_98062.canTransitionToSelf = false;
+			lAnyTransition_98062.orderedInterruption = false;
+			lAnyTransition_98062.interruptionSource = (UnityEditor.Animations.TransitionInterruptionSource)2;
+			for (int i = lAnyTransition_98062.conditions.Length - 1; i >= 0; i--) { lAnyTransition_98062.RemoveCondition(lAnyTransition_98062.conditions[i]); }
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 3010f, "L" + rLayerIndex + "MotionPhase");
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 0f, "L" + rLayerIndex + "MotionForm");
+			lAnyTransition_98062.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, 1f, "L" + rLayerIndex + "MotionParameter");
+
+		}
+
+
+		#endregion Definition
+
 	}
 }

@@ -60,7 +60,7 @@ namespace WildWalrus.Input
 		protected bool mFirstPathValid = false;
 
 		[SerializeField] public Transform TargetVisualisation;
-		bool mNavMeshAgentNextPositionSet;
+		//bool mNavMeshAgentNextPositionSet;
 
 		public void OnStart()
 		{
@@ -122,9 +122,9 @@ namespace WildWalrus.Input
 
 		public bool OnUpdate()
 		{
-			Debug.Log("MCNavMeshInputSource OnUpdate");
+			//Debug.Log("MCNavMeshInputSource OnUpdate");
 			Utilities.Debug.Log.FileWrite("");
-			mNavMeshAgentNextPositionSet = false;
+			//mNavMeshAgentNextPositionSet = false;
 			// If we're on a link with no driver, create one
 			if (mNavMeshAgent.isOnOffMeshLink)
 			{
@@ -238,7 +238,7 @@ namespace WildWalrus.Input
 				// alway relative to our current position. Then, we can use the AC
 				// to move to a valid position.
 				mNavMeshAgent.nextPosition = mMotionController._Transform.position;
-				mNavMeshAgentNextPositionSet = true;
+				//mNavMeshAgentNextPositionSet = true;
 				// Set the new target destination. We do it at the end so that
 				// we can process the current path before changing it
 				SetDestination(lDestination);
@@ -283,7 +283,7 @@ namespace WildWalrus.Input
 		public void ClearTarget()
 		{
 			//Utilities.Debug.Log.FileWrite("ClearTarget()");
-			Debug.Log("MCNavMeshInputSource ClearTarget()");
+			//Debug.Log("MCNavMeshInputSource ClearTarget()");
 			mHasArrived = true;
 			mFirstPathSet = false;
 			mFirstPathValid = false;

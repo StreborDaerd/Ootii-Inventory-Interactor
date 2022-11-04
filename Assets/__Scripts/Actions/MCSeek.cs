@@ -83,7 +83,7 @@ namespace WildWalrus.BehaviorDesigner.Actions
 
 		protected void Stop()
 		{
-			Debug.Log("MCNavMeshInputSource Stop");
+			//Debug.Log("MCNavMeshInputSource Stop");
 			//if (MCNavMeshInputSource.mNavMeshAgent.hasPath)
 			//{
 			//	MCNavMeshInputSource.mNavMeshAgent.isStopped = true;
